@@ -1,1 +1,2 @@
-# fpis-exercises
+# exercises for functional programmin in scala
+

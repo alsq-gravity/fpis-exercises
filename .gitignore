@@ -1,2 +1,9 @@
+target/
+.idea/
 *.class
 *.log
+# vim
+*.sw?
+
+# Ignore [ce]tags files
+tags
