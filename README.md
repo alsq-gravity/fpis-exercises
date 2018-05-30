@@ -1,2 +1,2 @@
-# exercises for functional programmin in scala
+# exercises for functional programming in scala
 
