@@ -2,9 +2,9 @@ package org.exercises.fpis.ch3
 
 import org.specs2.mutable
 
-object Chapter3Spec extends mutable.Specification {
+object Chapter3LSpec extends mutable.Specification {
 
-  import Chapter3._
+  import Chapter3L._
 
   "tail" should {
     "return Nil for empty input" in {
@@ -544,10 +544,10 @@ object Chapter3Spec extends mutable.Specification {
       hasSubsequence(C3Cons(1, C3Cons(2, C3Cons(2, C3Cons(3,C3Nil)))), C3Cons(2, C3Cons(3, C3Nil))) must beTrue
     }
     "no match" in {
-      hasSubsequence(C3Cons(1, C3Cons(2, C3Cons(3, C3Nil))), C3Cons(5, C3Cons(3, C3Nil))) must beTrue
+      hasSubsequence(C3Cons(1, C3Cons(2, C3Cons(3, C3Nil))), C3Cons(5, C3Cons(3, C3Nil))) must beFalse
     }
     "another no match" in {
-      hasSubsequence(C3Cons(1, C3Cons(2, C3Cons(3, C3Nil))), C3Cons(2, C3Cons(5, C3Nil))) must beTrue
+      hasSubsequence(C3Cons(1, C3Cons(2, C3Cons(3, C3Nil))), C3Cons(2, C3Cons(5, C3Nil))) must beFalse
     }
   }
 
