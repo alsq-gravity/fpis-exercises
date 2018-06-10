@@ -2,20 +2,20 @@ package org.exercises.fpis.ch3
 
 import org.specs2.mutable
 
-object Chapter3TSpec extends mutable.Specification {
+object Chapter3XTSpec extends mutable.Specification {
 
-  import Chapter3T._
+  import Chapter3XT._
   
-  def t1p(a: Int) = C3Branch(C3Leaf(a),C3Stump)
-  def t1(a: Int,b:Int) = C3Branch(C3Leaf(a),C3Leaf(b))
-  def t2pp(a: Int, b:Int) = C3Branch(C3Leaf(a),t1p(b))
-  def t2p(a: Int, b:Int, c:Int) = C3Branch(C3Leaf(a),t1(b,c))
-  def lPop(a: Int, b:Int, r: C3Tree[Int]) = C3Branch(t1(a,b),r)
-  def rPop(l: C3Tree[Int], a: Int, b:Int) = C3Branch(l,t1(a,b))
+  def t1p(a: Int) = C3XBranch(C3XLeaf(a),C3XStump)
+  def t1(a: Int,b:Int) = C3XBranch(C3XLeaf(a),C3XLeaf(b))
+  def t2pp(a: Int, b:Int) = C3XBranch(C3XLeaf(a),t1p(b))
+  def t2p(a: Int, b:Int, c:Int) = C3XBranch(C3XLeaf(a),t1(b,c))
+  def lPop(a: Int, b:Int, r: C3XTree[Int]) = C3XBranch(t1(a,b),r)
+  def rPop(l: C3XTree[Int], a: Int, b:Int) = C3XBranch(l,t1(a,b))
 
   "c3size" should {
     "return 1 for empty input" in {
-      c3size[Int](C3Stump) must_=== 1
+      c3size[Int](C3XStump) must_=== 1
     }
     "return 3 for partial depth-one" in {
       c3size(t1p(1)) must_=== 3
@@ -36,7 +36,7 @@ object Chapter3TSpec extends mutable.Specification {
 
   "tMaxInt" should {
     "return MIN for empty input" in {
-      tMaxInt(C3Stump) must_=== Int.MinValue
+      tMaxInt(C3XStump) must_=== Int.MinValue
     }
     "return 1 for partial depth-one" in {
       tMaxInt(t1p(1)) must_=== 1
@@ -57,7 +57,7 @@ object Chapter3TSpec extends mutable.Specification {
 
   "c3depth" should {
     "return 0 for empty input" in {
-      c3depth(C3Stump) must_=== 0 + depthOffset
+      c3depth(C3XStump) must_=== 0 + depthOffset
     }
     "return 1 for partial depth-one" in {
       c3depth(t1p(1)) must_=== 1 + depthOffset
@@ -84,10 +84,10 @@ object Chapter3TSpec extends mutable.Specification {
     def f(i: Int): Int = i*i
 
     "return empty for empty input" in {
-      c3map(C3Stump)(f) must_=== C3Stump
+      c3map(C3XStump)(f) must_=== C3XStump
     }
     "return root for root" in {
-      c3map(C3Leaf(5))(f) must_=== C3Leaf(f(5))
+      c3map(C3XLeaf(5))(f) must_=== C3XLeaf(f(5))
     }
     "return partial depth-one for partial depth-one" in {
       c3map(t1p(1))(f) must_=== t1p(f(1))
@@ -111,7 +111,7 @@ object Chapter3TSpec extends mutable.Specification {
 
   "c3sizeByF" should {
     "return 1 for empty input" in {
-      c3sizeByF[Int](C3Stump) must_=== 1
+      c3sizeByF[Int](C3XStump) must_=== 1
     }
     "return 3 for partial depth-one" in {
       c3sizeByF(t1p(1)) must_=== 3
@@ -132,7 +132,7 @@ object Chapter3TSpec extends mutable.Specification {
 
   "tMaxIntByF" should {
     "return MIN for empty input" in {
-      tMaxIntByF(C3Stump) must_=== Int.MinValue
+      tMaxIntByF(C3XStump) must_=== Int.MinValue
     }
     "return 1 for partial depth-one" in {
       tMaxIntByF(t1p(1)) must_=== 1
@@ -153,7 +153,7 @@ object Chapter3TSpec extends mutable.Specification {
 
   "c3depthByF" should {
     "return 0 for empty input" in {
-      c3depthByF(C3Stump) must_=== 0 + depthOffset
+      c3depthByF(C3XStump) must_=== 0 + depthOffset
     }
     "return 1 for partial depth-one" in {
       c3depthByF(t1p(1)) must_=== 1 + depthOffset
@@ -180,10 +180,10 @@ object Chapter3TSpec extends mutable.Specification {
     def f(i: Int): Int = i*i
 
     "return empty for empty input" in {
-      c3mapByF(C3Stump)(f) must_=== C3Stump
+      c3mapByF(C3XStump)(f) must_=== C3XStump
     }
     "return root for root" in {
-      c3mapByF(C3Leaf(5))(f) must_=== C3Leaf(f(5))
+      c3mapByF(C3XLeaf(5))(f) must_=== C3XLeaf(f(5))
     }
     "return partial depth-one for partial depth-one" in {
       c3mapByF(t1p(1))(f) must_=== t1p(f(1))
@@ -204,4 +204,35 @@ object Chapter3TSpec extends mutable.Specification {
       c3mapByF(lPop(1,2,rPop(t1p(4),5,6)))(f) must_=== lPop(f(1),f(2),rPop(t1p(f(4)),f(5),f(6)))
     }
   }
+
+  "leftLinear" should {
+
+    def f(i: Int): C3XTree[Int] = C3XLeaf(i)
+
+    "return empty for empty input" in {
+      leftLinear(C3XStump) must_=== C3Cons(C3XStump, C3Nil)
+    }
+    "return root for root" in {
+      leftLinear(C3XLeaf(5)) must_=== C3Cons(f(5), C3Nil)
+    }
+    "return partial depth-one for partial depth-one" in {
+      leftLinear(t1p(1)) must_=== C3Cons(f(1), C3Cons(C3XStump, C3Nil))
+    }
+    "return depth-one for depth-one" in {
+      leftLinear(t1(12,2)) must_=== C3Cons(f(12), C3Cons(f(2), C3Nil))
+    }
+    "return sparse depth-two for sparse depth-two" in {
+      leftLinear(t2pp(-1,2)) must_=== C3Cons(f(-1), C3Cons(f(2), C3Cons(C3XStump, C3Nil)))
+    }
+    "return partial depth-two for partial depth-two" in {
+      leftLinear(t2p(15,2,3)) must_=== C3Cons(f(15), C3Cons(f(2), C3Cons(f(3),C3Nil)))
+    }
+    "return depth-two for depth-two" in {
+      leftLinear(lPop(1,2,t1(3,4))) must_=== C3Cons(f(1), C3Cons(f(2), C3Cons(f(3), C3Cons(f(4), C3Nil))))
+    }
+    "return partial depth-three for partial depth-three" in {
+      leftLinear(lPop(1,2,rPop(t2p(4,5,6),7,8))) must_=== C3Cons(f(1), C3Cons(f(2), C3Cons(f(4), C3Cons(f(5), C3Cons(f(6), C3Cons(f(7), C3Cons(f(8), C3Nil)))))))
+    }
+  }
+
 }

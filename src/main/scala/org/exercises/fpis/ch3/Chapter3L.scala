@@ -259,5 +259,24 @@ object Chapter3L {
     }
   }
 
+  // not requested
+
+//  sealed trait MRC[A]
+//  class Continue[A](n: => MRC[A]) extends MRC[A] { lazy val next = n }
+//  case class Done[A](result: A) extends MRC[A]
+
+  type C3Stack[A] = C3List[A]
+
+  def push[A](v: A, stack:C3Stack[A]):C3Stack[A] = C3Cons(v,stack)
+  def isEmpty[A](stack:C3Stack[A]): Boolean = stack match {
+    case C3Nil => true
+    case _ => false
+  }
+  def pop[A](stack:C3Stack[A]): (A,C3Stack[A])  = stack match {
+    case C3Cons(x,xs) => (x,xs)
+    case _ => throw new RuntimeException("call isEmpty first")
+  }
+  def depth[A](stack:C3Stack[A]): Int = lenl(stack)
+
 
 }
