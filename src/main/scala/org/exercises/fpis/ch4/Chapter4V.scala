@@ -6,7 +6,7 @@ object Chapter4V {
 
   def mean(xs: C3List[Double]): C4Option[Double] = xs match {
     case C3Nil => C4None
-    case _ => C4Some(Chapter3L.foldLeft(xs,0.0)((last:Double, v: Double) => last+v) / Chapter3L.lenl(xs).toDouble)
+    case _ => C4Some(Chapter3L.foldLeft(xs,0.0)((last:Double, x: Double) => last+x) / Chapter3L.lenl(xs).toDouble)
   }
   def variance(xs: C3List[Double]): C4Option[Double] = mean(xs).map(mu =>
       Chapter3L.foldLeft(xs,0.0)((last:Double, x: Double) => last + Math.pow(x - mu,2.0)) / Chapter3L.lenl(xs).toDouble
