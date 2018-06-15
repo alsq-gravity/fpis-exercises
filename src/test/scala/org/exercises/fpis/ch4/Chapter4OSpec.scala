@@ -112,18 +112,18 @@ object Chapter4OSpec extends mutable.Specification {
     }
   }
 
-  "c4try" should {
+  "otry" should {
 
-    import C4Option.c4try
+    import C4Option.otry
 
     val niDefault: C4Option[Int] = C4None
     def s2i(a: String): Int = a.toInt
 
     "behave for Some" in {
-      c4try(s2i("5")) must_=== C4Some(5)
+      otry(s2i("5")) must_=== C4Some(5)
     }
     "behave for None" in {
-      c4try(s2i("5.0")) must_=== niDefault
+      otry(s2i("5.0")) must_=== niDefault
     }
   }
 
@@ -137,16 +137,16 @@ object Chapter4OSpec extends mutable.Specification {
     def i2(a: Int, b: String): Double  = (a+s2i(b)).toDouble
 
     "behave for Some,Some" in {
-      map2(c4try(s2i("1")),C4Some("2"))(i2) must_=== C4Some(3.0)
+      map2(otry(s2i("1")),C4Some("2"))(i2) must_=== C4Some(3.0)
     }
     "behave for Some,None" in {
-      map2(c4try(s2i("1")),nsDefault)(i2) must_=== C4None
+      map2(otry(s2i("1")),nsDefault)(i2) must_=== C4None
     }
     "behave for None,Some" in {
-      map2(c4try(s2i("1.5")),C4Some("2"))(i2) must_=== C4None
+      map2(otry(s2i("1.5")),C4Some("2"))(i2) must_=== C4None
     }
     "behave for None,None" in {
-      map2(c4try(s2i("1.5")),nsDefault)(i2) must_=== C4None
+      map2(otry(s2i("1.5")),nsDefault)(i2) must_=== C4None
     }
   }
 
@@ -177,7 +177,7 @@ object Chapter4OSpec extends mutable.Specification {
 
   "traverse" should {
 
-    import C4Option.{traverse, c4try}
+    import C4Option.{traverse, otry}
 
     val ls1: C3List[String] = C3Cons("1", C3Nil)
     val ls2: C3List[String] = C3Cons("1", C3Cons("2", C3Nil))
@@ -186,7 +186,7 @@ object Chapter4OSpec extends mutable.Specification {
     val li1: C3List[Int] = C3Cons(1, C3Nil)
     val li2: C3List[Int] = C3Cons(1, C3Cons(2, C3Nil))
     val li3: C3List[Int] = C3Cons(1, C3Cons(2, C3Cons(3, C3Nil)))
-    def s2oi(s: String): C4Option[Int] = c4try(s.toInt)
+    def s2oi(s: String): C4Option[Int] = otry(s.toInt)
 
     "behave for list of sizes 1,2,3" in {
       traverse(ls1)(s2oi) must_=== C4Some(li1)

@@ -28,7 +28,7 @@ object C4Option {
 
   def lift[A,B](f: A => B): C4Option[A] => C4Option[B] = _ map(f)
   def map2[A,B,C](oa: C4Option[A], ob: C4Option[B])(f: (A,B) => C): C4Option[C] = oa.flatMap( a => ob.map( b => f(a,b)))
-  def c4try[A](a: => A): C4Option[A] = try C4Some(a) catch { case _:Exception => C4None }
+  def otry[A](a: => A): C4Option[A] = try C4Some(a) catch { case _:Exception => C4None }
   def sequence[A](la:C3List[C4Option[A]]): C4Option[C3List[A]] = la match {
     case C3Nil => C4None
     case C3Cons(oa,C3Nil) => oa.map[C3List[A]](a => C3Cons(a,C3Nil))
