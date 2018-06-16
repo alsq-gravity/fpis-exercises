@@ -201,6 +201,32 @@ object Chapter4OSpec extends mutable.Specification {
     }
   }
 
+  "traverseF" should {
+
+    import C4Option.{traverseF, otry}
+
+    val ls1: C3List[String] = C3Cons("1", C3Nil)
+    val ls2: C3List[String] = C3Cons("1", C3Cons("2", C3Nil))
+    val ls3: C3List[String] = C3Cons("1", C3Cons("2", C3Cons("3", C3Nil)))
+    val lsp3: C3List[String] = C3Cons("1", C3Cons("2.5", C3Cons("3", C3Nil)))
+    val li1: C3List[Int] = C3Cons(1, C3Nil)
+    val li2: C3List[Int] = C3Cons(1, C3Cons(2, C3Nil))
+    val li3: C3List[Int] = C3Cons(1, C3Cons(2, C3Cons(3, C3Nil)))
+    def s2oi(s: String): C4Option[Int] = otry(s.toInt)
+
+    "behave for list of sizes 1,2,3" in {
+      traverseF(ls1)(s2oi) must_=== C4Some(li1)
+      traverseF(ls2)(s2oi) must_=== C4Some(li2)
+      traverseF(ls3)(s2oi) must_=== C4Some(li3)
+    }
+    "behave for empty list" in {
+      traverseF(C3Nil)(s2oi) must_=== C4None
+    }
+    "behave for list with poison pill" in {
+      traverseF(lsp3)(s2oi) must_=== C4None
+    }
+  }
+
   "sequenceT" should {
 
     import C4Option.sequenceT
