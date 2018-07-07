@@ -78,6 +78,16 @@ sealed trait C5Stream[+A] {
     go(this)
   }
 
+  def exists(p: A => Boolean): Boolean = {
+    @tailrec
+    def go(depleting: C5Stream[A]): Boolean = depleting match {
+      case C5Empty => false
+      case C5Cons(at, _) if p(at()) => true
+      case C5Cons(_, ats) => go(ats())
+    }
+    go(this)
+  }
+
   // 5.5
   def takeWhileR(p: A => Boolean): C5Stream[A] = {
     def f(a: A, s: => C5Stream[A]): C5Stream[A] = if (p(a)) C5Stream.cons(a,s) else C5Stream.empty
@@ -130,6 +140,23 @@ sealed trait C5Stream[+A] {
     C5Stream.unfold[A,C5Stream[A]](this)(next)
   }
 
+  // 5.14
+  @tailrec
+  final def startsWith[B >: A](s: C5Stream[B]): Boolean = {
+    C5Stream.c5zipWith(this,s)((a1:A, a2:B) => a1 == a2) match {
+      case C5Empty => true
+      case C5Cons(a,_) => if (!a()) false else this.drop(1).startsWith(s.drop(1))
+    }
+  }
+
+  // 5.15
+  def tails: C5Stream[C5Stream[A]] = {
+    def next(aas: C5Stream[A]): C4Option[(C5Stream[A], C5Stream[A])] = aas.headOption.map(_ => (aas,aas.drop(1)))
+    C5Stream.unfold[C5Stream[A],C5Stream[A]](this)(next)
+  }
+
+  // 5.16
+  def hasSubsequence[B >: A](s: C5Stream[B]): Boolean = tails.exists(_.startsWith(s))
 
 }
 
@@ -180,11 +207,13 @@ object C5Stream {
     maybeC.fold(C5Stream.empty[C])((c:C) => C5Stream.cons[C](c,c5zipWith(ina.drop(1),inb.drop(1))(f)))
   }
   def unfoldZipAll[A,B](ina: C5Stream[A], inb: C5Stream[B]): C5Stream[(C4Option[A],C4Option[B])] = {
-    def next(aas:C5Stream[A], bbs:C5Stream[B]): C4Option[((C4Option[A], C4Option[B]), (C5Stream[A], C5Stream[B]))] = (aas.headOption, bbs.headOption) match {
+    type value = (C4Option[A],C4Option[B])
+    type state = (C5Stream[A], C5Stream[B])
+    def next(aas:C5Stream[A], bbs:C5Stream[B]): C4Option[(value, state)] = (aas.headOption, bbs.headOption) match {
       case (C4None,C4None) => C4None
-      case _ => C4Some(((ina.headOption,inb.headOption),(ina.drop(1),inb.drop(1))))
+      case _ => C4Some(((aas.headOption,bbs.headOption),(aas.drop(1),bbs.drop(1))))
     }
-    unfold[(C4Option[A], C4Option[B]), (C5Stream[A], C5Stream[B])]((ina, inb))(ina_inb => next(ina_inb._1, ina_inb._2))
+    unfold[value, state]((ina, inb))(as_bs => next(as_bs._1, as_bs._2))
   }
 
 }

@@ -1,7 +1,7 @@
 package org.exercises.fpis.ch5
 
 import org.exercises.fpis.ch3.{C3Cons, C3List, C3Nil}
-import org.exercises.fpis.ch4.{C4None, C4Some}
+import org.exercises.fpis.ch4.{C4None, C4Option, C4Some}
 import org.specs2.mutable
 
 object Chapter5Spec  extends mutable.Specification {
@@ -15,6 +15,13 @@ object Chapter5Spec  extends mutable.Specification {
   val li1 = C3Cons(3, C3Nil)
   val li2 = C3Cons(2, li1)
   val li3 = C3Cons(1, li2)
+
+  val sc1 = cons('c', C5Empty)
+  val sc2 = cons('b', sc1)
+  val sc3 = cons('a', sc2)
+  val lc1 = C3Cons('c', C3Nil)
+  val lc2 = C3Cons('b', lc1)
+  val lc3 = C3Cons('a', lc2)
 
   "toList" should {
 
@@ -321,6 +328,87 @@ object Chapter5Spec  extends mutable.Specification {
     }
   }
 
+  "c5zipWith" should {
+
+    import C5Stream.c5zipWith
+
+    "behave for equal length streams" in {
+      c5zipWith[Int,Char,String](si3,sc3)((i:Int,c:Char) => i.toString+c.toString).toList must_=== C3Cons("1a",C3Cons("2b",C3Cons("3c",C3Nil)))
+    }
+
+    "behave for unequal length streams" in {
+      c5zipWith[Int,Char,String](si3,sc2)((i:Int,c:Char) => i.toString+c.toString).toList must_=== C3Cons("1b",C3Cons("2c",C3Nil))
+      c5zipWith[Int,Char,String](si2,sc3)((i:Int,c:Char) => i.toString+c.toString).toList must_=== C3Cons("2a",C3Cons("3b",C3Nil))
+    }
+
+    "behave for empty streams" in {
+      c5zipWith[Int,Char,String](C5Stream.empty[Int],sc2)((i:Int,c:Char) => i.toString+c.toString) must_=== C5Empty
+      c5zipWith[Int,Char,String](si2,C5Stream.empty[Char])((i:Int,c:Char) => i.toString+c.toString) must_=== C5Empty
+    }
+
+  }
+
+  "unfoldZipAll" should {
+
+    import Chapter3L.c3zipWith
+    import Chapter3L.append
+
+    "behave for equal length streams" in {
+      unfoldZipAll[Int,Char](si3,sc3).toList must_=== c3zipWith[Int,Char,(C4Option[Int],C4Option[Char])](li3,lc3)((i:Int,c:Char) => (C4Some(i),C4Some(c)))
+    }
+
+    "behave for unequal length streams" in {
+      unfoldZipAll[Int,Char](si3,sc2).toList must_=== append(c3zipWith[Int,Char,(C4Option[Int],C4Option[Char])](li3,lc2)((i:Int,c:Char) => (C4Some(i),C4Some(c))),(C4Some(3),C4None))
+      unfoldZipAll[Int,Char](si2,sc3).toList must_=== append(c3zipWith[Int,Char,(C4Option[Int],C4Option[Char])](li2,lc3)((i:Int,c:Char) => (C4Some(i),C4Some(c))),(C4None,C4Some('c')))
+    }
+
+    "behave for empty streams" in {
+      unfoldZipAll[Int,Char](C5Stream.empty[Int],sc2).toList must_=== c3zipWith(li2,lc2)((_,c:Char) => (C4None,C4Some(c)))
+      unfoldZipAll[Int,Char](si2,C5Stream.empty[Char]).toList must_=== c3zipWith(li2,lc2)((i:Int,_) => (C4Some(i),C4None))
+    }
+
+  }
+
+  "startsWith" should {
+    "behave for equal length streams" in {
+      si3.startsWith(si3) must beTrue
+    }
+    "behave for unequal length streams" in {
+      si3.startsWith(si3.take(2)) must beTrue
+      si3.startsWith(si3.take(1)) must beTrue
+    }
+    "fail when needed streams" in {
+      si3.startsWith(si3.drop(1)) must beFalse
+    }
+  }
+
+  "tails" should {
+
+    import Chapter3L.{c3map,tail}
+
+    "unwrap the stream" in {
+      c3map(si3.tails.toList)(stream => stream.toList) must_=== C3Cons(li3,C3Cons(li3.tail,C3Cons(tail(li3.tail),C3Nil)))
+      println(s"${c3map(si3.tails.toList)(stream => stream.toList)}")
+      println(s"${C3Cons(li3,C3Cons(li3.tail,C3Cons(tail(li3.tail),C3Nil)))}")
+      ok
+    }
+  }
+
+  "hasSubsequence" should {
+    // this test is crude and grossly inadequate, but it's a test
+    "simple match" in {
+      si3.hasSubsequence(si2) must beTrue
+    }
+    "another simple match" in {
+      si3.hasSubsequence(C5Stream.cons(1,C5Stream.empty[Int])) must beTrue
+    }
+    "no match" in {
+      si2.hasSubsequence(si3) must beFalse
+    }
+    "another no match" in {
+      si2.hasSubsequence(C5Stream.cons(1,C5Stream.empty[Int])) must beFalse
+    }
+  }
 
 
 }
